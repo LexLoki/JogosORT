@@ -4,9 +4,10 @@ local L,A
 local objetos = {}
 local tempoNascimento = 0.8
 local temporizador
+local temporizadorProgressao
+local velocidade = 200
 local objLargura =  50
 local objAltura = 50
-
 local macacos = {}
 local macacoLargura = 150
 local macacoAltura = 200
@@ -14,8 +15,17 @@ local macacoAltura = 200
 --tabelas de imagens
 local macacoPega = {}
 local macacoAbaixa = {}
-local banana = {}
-local bomba = {}
+local banana
+local bomba
+local fundo
+
+local bombaSom
+
+local pontos
+local nivel
+local vidas
+local gameover = false
+
 
 local function carregarImagens(caminho,quantidade)
   local imgs = {}
@@ -50,19 +60,38 @@ function love.load()
   love.graphics.setDefaultFilter('nearest','nearest',1)
   L,A = love.graphics.getDimensions()
   temporizador = 0
+  temporizadorProgressao = 0
   loadMacaco()
+  banana = love.graphics.newImage('imagens/banana.png')
+  bomba = love.graphics.newImage('imagens/bomb_0.png')
+  fundo = love.graphics.newImage('imagens/background.png')
+  pontos = 0
+  local fonte = love.graphics.newFont(30)
+  love.graphics.setFont(fonte)
+  
+  vidas = 3
+  
+  bombaSom = love.audio.newSource('bomb.mp3')
+  nivel = 1
 end
 
 function moverObjetos(dt)
   local obj
   for i=1,#objetos do
     obj = objetos[i]
-    obj.y = obj.y + 200*dt
+    obj.y = obj.y + velocidade*dt
   end
 end
 
 function nascerObjeto(dt)
   temporizador = temporizador + dt
+  temporizadorProgressao = temporizadorProgressao + dt
+  if temporizadorProgressao > 10 then
+    nivel = nivel+1
+    temporizadorProgressao = 0
+    tempoNascimento = tempoNascimento*0.9
+    velocidade = velocidade*1.1
+  end
   if temporizador >= tempoNascimento then
     temporizador = 0
     local rand = love.math.random(0,2)
@@ -111,7 +140,18 @@ function objetosContato(dt)
     raia = obj.raia
     mac = macacos[raia]
     if mac.estado == macacoPega and mac.y > obj.y and mac.y < obj.y + obj.largura then
+      --Pegou banana ou bomba
       table.remove(objetos,i)
+      if obj.tipo == 1 then
+        pontos = pontos + 1
+      else
+        bombaSom:rewind()
+        bombaSom:play()
+        vidas = vidas - 1
+        if vidas==0 then
+          gameover = true
+        end
+      end
     end
   end
 end
@@ -126,11 +166,13 @@ function trocaEstado(macaco)
 end
 
 function love.update(dt)
-  moverObjetos(dt)
-  nascerObjeto(dt)
-  verificarContato(dt)
-  animarMacacos(dt)
-  objetosContato(dt)
+  if not gameover then
+    moverObjetos(dt)
+    nascerObjeto(dt)
+    verificarContato(dt)
+    animarMacacos(dt)
+    objetosContato(dt)
+  end
 end
 
 function love.mousepressed(x,y,button)
@@ -145,8 +187,9 @@ end
 
 function love.draw()
   local obj,mac
-  --Desenha macaco
   love.graphics.setColor(255,255,255)
+  love.graphics.draw(fundo,0,0,0,0.5)
+  --Desenha macaco
   for i=1,#macacos do
     mac = macacos[i]
     --love.graphics.rectangle('fill',mac.x,mac.y,mac.largura,mac.altura)
@@ -157,12 +200,21 @@ function love.draw()
   --Desenha objetos
   for i=1,#objetos do
     obj = objetos[i]
+    local imagem
     if obj.tipo == 1 then --se for banana, pinta de verde
-      love.graphics.setColor(0,255,0)
+      imagem = banana
     else --se for bomba pinta de vermelho
-      love.graphics.setColor(255,0,0)
+      imagem = bomba
     end
-    love.graphics.rectangle('fill',obj.x,obj.y,obj.largura,obj.altura)
+    --love.graphics.rectangle('fill',obj.x,obj.y,obj.largura,obj.altura)
+    love.graphics.draw(imagem,obj.x,obj.y,0,1.5,1.5)
   end
+  
   love.graphics.setColor(255,255,255)
+  love.graphics.print('Pontos: '..pontos)
+  love.graphics.printf('Vidas: '..vidas,0,0,L,'right')
+  love.graphics.printf('Nivel\n'..nivel,0,0,L,'center')
+  if gameover then
+    love.graphics.printf('Voce perdeu, HAHAHAH',0,200,L,'center')
+  end
 end
