@@ -26,6 +26,26 @@ local nivel
 local vidas
 local gameover = false
 
+local sx,sy = 2,2
+local ox,oy = 1.5,1.5
+local bx,by = 0.5,0.5
+
+
+local function loadProporcional()
+  local dw,dh = 800,600
+  local w,h = love.graphics.getDimensions()
+  macacoAltura = macacoAltura * h/dh
+  macacoLargura = macacoLargura * w/dw
+  objAltura = objAltura * h/dh
+  objLargura = objLargura * w/dw
+  velocidade = velocidade * h/dh
+  sx = math.min(sx * w/dw, sy * h/dh)
+  sy = sx
+  ox = math.min(ox * w/dw, oy * h/dh)
+  oy = ox
+  bx = bx * w/dw
+  by = by * h/dh
+end
 
 local function carregarImagens(caminho,quantidade)
   local imgs = {}
@@ -57,6 +77,7 @@ function loadMacaco()
 end
 
 function love.load()
+  loadProporcional()
   love.graphics.setDefaultFilter('nearest','nearest',1)
   L,A = love.graphics.getDimensions()
   temporizador = 0
@@ -185,15 +206,20 @@ function love.mousepressed(x,y,button)
   end
 end
 
+function love.touchpressed(id,x,y)
+  print(x,y)
+  --love.mousepressed(x,y,1)
+end
+
 function love.draw()
   local obj,mac
   love.graphics.setColor(255,255,255)
-  love.graphics.draw(fundo,0,0,0,0.5)
+  love.graphics.draw(fundo,0,0,0,bx,by)
   --Desenha macaco
   for i=1,#macacos do
     mac = macacos[i]
     --love.graphics.rectangle('fill',mac.x,mac.y,mac.largura,mac.altura)
-    love.graphics.draw(mac.estado[mac.quadro],mac.x,mac.y,0,2,2)
+    love.graphics.draw(mac.estado[mac.quadro],mac.x,mac.y,0,sx,sy)
     --love.graphics.rectangle('fill',mac.x,mac.y,mac.largura,mac.altura)
   end
   
@@ -207,7 +233,7 @@ function love.draw()
       imagem = bomba
     end
     --love.graphics.rectangle('fill',obj.x,obj.y,obj.largura,obj.altura)
-    love.graphics.draw(imagem,obj.x,obj.y,0,1.5,1.5)
+    love.graphics.draw(imagem,obj.x,obj.y,0,ox,oy)
   end
   
   love.graphics.setColor(255,255,255)
