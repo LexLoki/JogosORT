@@ -10,7 +10,7 @@ function player.load()
   player.altura = 100
   alturaMax = love.graphics.getHeight()
   
-  player.grav = 100
+  player.grav = 500
 end
 
 function player.update(dt)
