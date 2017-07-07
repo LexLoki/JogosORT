@@ -32,6 +32,9 @@ function game.keypressed(key)
   end
 end
 
+function game.mousepressed(x,y)
+end
+
 function game.draw()
   back.draw()
   pl.draw()

@@ -6,7 +6,7 @@ local imgW
 function back.load()
   back.vel = 150
   back.x = 0
-  image = love.graphics.newImage('background2.png')
+  image = love.graphics.newImage('assets/Bg_Space.png')
   local imgH = image:getHeight()
   local H = love.graphics.getHeight()
   scale = H/imgH
@@ -23,6 +23,7 @@ end
 function back.draw()
   love.graphics.draw(image,back.x,0,0,scale)
   love.graphics.draw(image,back.x+imgW,0,0,scale)
+  love.graphics.draw(image,back.x+imgW*2,0,0,scale)
 end
 
 return back
