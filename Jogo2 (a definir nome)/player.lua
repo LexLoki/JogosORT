@@ -9,6 +9,8 @@ local function loadAnimation()
   for i=1,4 do
     sprites[i] = love.graphics.newImage('assets/player/a_spaceShip_'..i..'.png')
   end
+  sprites[5] = sprites[3]
+  sprites[6] = sprites[2]
   frame = 1
   local iw,ih = sprites[1]:getDimensions()
   sw = player.largura/iw

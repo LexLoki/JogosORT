@@ -4,16 +4,31 @@ local enemy = {
   height = 100
 }
 
-local colors = {
-  {255,0,0},
-  {0,255,0},
-  {0,0,255}
-}
+local sprites = {}
+local scale
 
 local timer
 
+local function loadAnimation()
+  for i=1,3 do
+    sprites[i] = {}
+    for j=1,4 do
+      sprites[i][j] = love.graphics.newImage('assets/enemies/h_'..i..'_spaceship_'..j..'.png')
+      sprites[i][5] = sprites[i][3]
+      sprites[i][6] = sprites[i][2]
+    end
+  end
+  local iw,ih = sprites[1][1]:getDimensions()
+  local sw = enemy.width/iw
+  local sh = enemy.height/ih
+  scale = math.min(sw,sh)
+  enemy.width = iw*scale
+  enemy.height = ih*scale
+end
+
 function enemy.load()
   timer = 0
+  loadAnimation()
 end
 
 function enemy.spawn()
@@ -21,8 +36,13 @@ function enemy.spawn()
     x = love.graphics.getWidth(),
     y = love.math.random(0,love.graphics.getHeight()),
     vel = 300,
-    id = love.math.random(1,3)
+    id = love.math.random(1,3),
+    frame = 1,
+    timer = 0
   }
+  if en.id == 3 then
+    en.y = en.y - love.graphics.getHeight()/2
+  end
   table.insert(enemy.list,en)
 end
 
@@ -35,18 +55,34 @@ function enemy.update(dt)
   local en
   for i=1,#enemy.list do
     en = enemy.list[i]
-    en.x = en.x - en.vel*dt
+    --Tempo de animacao
+    en.timer = en.timer + dt
+    if en.timer > 0.2 then
+      en.timer = 0
+      en.frame = en.frame + 1
+      if en.frame > #sprites[en.id] then
+        en.frame = 1
+      end
+    end
+    --Move Inimigo
+    en.x = en.x - en.vel*dt --Move todos
+    if en.id == 2 then --Move duas vezes o tipo 2
+      en.x = en.x - en.vel*dt
+    elseif en.id == 3 then --Move no eixo y o tipo 3
+      en.y = en.y + en.vel/2*dt
+    end
   end
 end
 
 function enemy.draw()
   local en
-  love.graphics.setColor(255,0,0)
+  --love.graphics.setColor(255,0,0)
   for i=1,#enemy.list do
     en = enemy.list[i]
-    love.graphics.rectangle('fill',en.x,en.y,enemy.width,enemy.height)
+    --love.graphics.rectangle('fill',en.x,en.y,enemy.width,enemy.height)
+    love.graphics.draw(sprites[en.id][en.frame],en.x,en.y,0,scale)
   end
-  love.graphics.setColor(255,255,255)
+  --love.graphics.setColor(255,255,255)
 end
 
 return enemy
