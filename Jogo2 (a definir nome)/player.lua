@@ -13,8 +13,8 @@ local function loadAnimation()
   sprites[6] = sprites[2]
   frame = 1
   local iw,ih = sprites[1]:getDimensions()
-  sw = player.largura/iw
-  sh = player.altura/ih
+  sw = player.width/iw
+  sh = player.height/ih
   timer = 0
   time = 0.2
 end
@@ -23,12 +23,14 @@ function player.load()
   player.vel = -200
   player.x = 100
   player.y = 350
-  player.largura = 100
-  player.altura = 100
+  player.width = 100
+  player.height = 100
   alturaMax = love.graphics.getHeight()
   
   player.grav = 500
   loadAnimation()
+
+  player.height = player.height*0.6
 end
 
 function player.update(dt)
@@ -44,7 +46,7 @@ function player.update(dt)
   player.vel = player.vel + player.grav*dt -- Aplicando gravidade na velocidade
 
   -- Verificando condicao de derrota
-  if player.y >= alturaMax-player.altura then
+  if player.y >= alturaMax-player.height then
     player.y = 350
     player.jump()
     return false
@@ -58,11 +60,11 @@ function player.update(dt)
 end
 
 function player.jump()
-  player.vel = -200
+  player.vel = -300
 end
 
 function player.draw()
-  --love.graphics.rectangle('fill',player.x,player.y,player.largura,player.altura)
+  --love.graphics.rectangle('line',player.x,player.y,player.width,player.height)
   love.graphics.draw(sprites[frame],player.x,player.y,0,sw,sh)
 end
 

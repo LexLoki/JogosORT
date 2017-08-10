@@ -9,6 +9,15 @@ local scale
 
 local timer
 
+local time_spawn_i = 3.4
+local time_spawn = time_spawn_i
+
+local vel_i = 150
+local vel = vel_i
+
+
+local id_max = 1
+
 local function loadAnimation()
   for i=1,3 do
     sprites[i] = {}
@@ -31,12 +40,22 @@ function enemy.load()
   loadAnimation()
 end
 
+function enemy.start()
+  enemy.list = {}
+  timer = 0
+  time_spawn = time_spawn_i
+  id_max = 1
+  vel = vel_i
+end
+
 function enemy.spawn()
   local en = {
     x = love.graphics.getWidth(),
     y = love.math.random(0,love.graphics.getHeight()),
-    vel = 300,
-    id = love.math.random(1,3),
+    width = enemy.width,
+    height = enemy.height,
+    vel = vel,
+    id = love.math.random(1,id_max),
     frame = 1,
     timer = 0
   }
@@ -46,10 +65,33 @@ function enemy.spawn()
   table.insert(enemy.list,en)
 end
 
-function enemy.update(dt)
+function enemy.update_progression(tim)
+  -- Variando quantos inimigos diferentes nascem
+  if tim > 20 then
+    id_max = 3
+  elseif tim > 10 then
+    id_max = 2
+  else
+    id_max = 1
+  end
+  -- Variando velocidade dos inimigos
+  vel = vel_i + tim*8
+  if vel > 500 then
+    vel = 500
+  end
+  -- Variando spawn dos inimigos
+  time_spawn = time_spawn_i - tim*0.04
+  if time_spawn < 1 then
+    time_spawn = 1
+  end
+end
+
+function enemy.update(dt,tim)
   timer = timer+dt
-  if timer>2 then
+  enemy.update_progression(tim)
+  if timer>time_spawn then
     timer = 0
+    enemy.spawn()
     enemy.spawn()
   end
   local en
@@ -79,7 +121,7 @@ function enemy.draw()
   --love.graphics.setColor(255,0,0)
   for i=1,#enemy.list do
     en = enemy.list[i]
-    --love.graphics.rectangle('fill',en.x,en.y,enemy.width,enemy.height)
+    --love.graphics.rectangle('line',en.x,en.y,enemy.width,enemy.height)
     love.graphics.draw(sprites[en.id][en.frame],en.x,en.y,0,scale)
   end
   --love.graphics.setColor(255,255,255)
