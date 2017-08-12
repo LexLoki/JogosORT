@@ -92,7 +92,6 @@ function enemy.update(dt,tim)
   if timer>time_spawn then
     timer = 0
     enemy.spawn()
-    enemy.spawn()
   end
   local en
   for i=1,#enemy.list do
