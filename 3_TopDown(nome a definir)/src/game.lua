@@ -1,17 +1,21 @@
 local game = {}
 
-local pl = require'src/player'
+local player = require'src/player'
+local enemy = require'src/enemy'
 
 function game.load()
-	pl.load()
+  player.load()
+  enemy.load(player)
 end
 
 function game.update(dt)
-	pl.update(dt)
+  player.update(dt)
+  enemy.update(dt)
 end
 
 function game.draw()
-	pl.draw()
+  player.draw()
+  enemy.draw()
 end
 
 return game
