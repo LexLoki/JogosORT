@@ -10,7 +10,11 @@ end
 
 function game.update(dt)
   player.update(dt)
-  enemy.update(dt)
+  local didEnd = enemy.update(dt)
+  if didEnd then
+  	player.reset()
+  	enemy.reset()
+  end
 end
 
 function game.draw()
