@@ -196,6 +196,20 @@ function love.update(dt)
   end
 end
 
+function love.keypressed(key)
+  if gameover then
+    if key=='return' then
+      gameover = false
+      temporizador = 0
+      temporizadorProgressao = 0
+      nivel = 1
+      pontos = 0
+      vidas = 3
+      objetos = {}
+    end
+  end
+end
+
 function love.mousepressed(x,y,button)
   local mac
   for i=1,#macacos do
@@ -241,6 +255,6 @@ function love.draw()
   love.graphics.printf('Vidas: '..vidas,0,0,L,'right')
   love.graphics.printf('Nivel\n'..nivel,0,0,L,'center')
   if gameover then
-    love.graphics.printf('Voce perdeu, HAHAHAH',0,200,L,'center')
+    love.graphics.printf('Fim de Jogo\nPressione enter para tentar novamente',0,200,L,'center')
   end
 end

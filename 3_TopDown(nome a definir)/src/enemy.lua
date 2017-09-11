@@ -1,30 +1,35 @@
 local en = {}
 
 local spawn_timer
-local spawn_time = 0.4 --Tempo que leva pra nascer um inimigo
+local spawn_time = 1
 
 local w,h
+local radius = 30
 
-local radius = 20
-local points = 0
-
-local cont = require'src/contact'
+local contact = require'src/contact'
 
 local colors = {
-  {255,0,0},
-  {0,0,255}
+    {255,0,0}, --colors[1]
+    {0,255,0}  --colors[2]
 }
+local images = {}
+local pivot = {}
+local scale = {}
+
+local anim_time = 0.4
 
 function en.load(player)
   w,h = love.graphics.getDimensions()
   en.list = {}
   en.player = player
   spawn_timer = 0
-end
-
-function en.reset()
-  en.list = {}
-  points = 0
+  images[1] = love.graphics.newImage('assets/r_z_1.png')
+  images[2] = love.graphics.newImage('assets/r_z_2.png')
+  local iw,ih = images[1]:getDimensions()
+  pivot.x = iw/2
+  pivot.y = ih/2
+  scale.x = radius*2.1/iw
+  scale.y = radius*2.1/ih
 end
 
 function en.spawn()
@@ -33,7 +38,9 @@ function en.spawn()
     y = 100,
     hp = 10,
     dmg = 5,
-    speed = 50,
+    speed = 140,
+    timer = 0,
+    frame = 1,
     id = love.math.random(1,2)
   }
   local area = love.math.random(1,4)
@@ -50,7 +57,13 @@ function en.spawn()
     e.x = love.math.random(0,1.2*w)
     e.y = 1.2*h
   end
+  e.x = e.x + offsetx
+  e.y = e.y + offsety
   table.insert(en.list,e)
+end
+
+function en.reset()
+  en.list = {}
 end
 
 function en.movement(dt)
@@ -70,34 +83,54 @@ function en.movement(dt)
   end
 end
 
-function en.contact()
+function en.animation(dt)
   local e
-  local p = en.player
-  for i=#en.list,1,-1 do
+  for i=1,#en.list do
     e = en.list[i]
-    if cont.circle(p.x,p.y,p.radius, e.x, e.y, radius) then
-      local area = p.getAngleArea(e.x,e.y)
-      if area == e.id then
-        points = points+1
-        table.remove(en.list,i)
-      else
-        return true --indica que o jogador errou
+    e.timer = e.timer + dt
+    if e.timer > anim_time then
+      e.timer = 0
+      e.frame = e.frame+1
+      if e.frame > #images then
+        e.frame = 1
       end
     end
   end
-  return false --se chega até aqui indica que nao teve contato negativo
 end
 
---Retorna falando se o jogo deve reiniciar
-function en.update(dt,player)
+-- Verifica se tem contato, se tiver
+--retorna verdadeiro. Se nao, falso.
+function en.contact(game)
+  local e
+  local p = en.player
+  local area
+  for i=#en.list,1,-1 do
+    e = en.list[i]
+    if contact.circle(e.x,e.y,radius,p.x,p.y,p.radius) == true then
+      area = p.getArea(e.x,e.y)
+      if area == e.id then
+        --mata inimigo
+        game.score = game.score+1
+        table.remove(en.list,i)
+      else
+        --reseta jogo (gameover)
+        return true
+      end
+    end
+  end
+  return false
+end
+
+function en.update(dt,game)
   spawn_timer = spawn_timer + dt
   if spawn_timer > spawn_time then
     spawn_timer = 0
     en.spawn()
   end
   en.movement(dt)
-  local didLose = en.contact()
-  return didLose
+  en.animation(dt)
+  local didEnd = en.contact(game)
+  return didEnd
 end
 
 function en.draw()
@@ -105,10 +138,9 @@ function en.draw()
   for i=1,#en.list do
     e = en.list[i]
     love.graphics.setColor(colors[e.id])
-    love.graphics.circle('fill',e.x,e.y,radius)
+    --love.graphics.circle('fill',e.x,e.y,radius)
+    love.graphics.draw(images[e.frame],e.x,e.y,e.angle,scale.x,scale.y,pivot.x,pivot.y)
   end
-  love.graphics.setColor(255,255,255)
-  love.graphics.print(points)
 end
 
 return en
