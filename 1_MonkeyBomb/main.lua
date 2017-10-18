@@ -221,6 +221,7 @@ end
 function love.keypressed(key)
   if gameover then
     if key=='return' then
+      velocidade = velocidadeInicial
       gameover = false
       temporizador = 0
       temporizadorProgressao = 0
