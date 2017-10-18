@@ -5,7 +5,8 @@ local objetos = {}
 local tempoNascimento = 0.8
 local temporizador
 local temporizadorProgressao
-local velocidade = 200
+local velocidadeInicial = 200
+local velocidade = velocidadeInicial
 local objLargura =  50
 local objAltura = 50
 local macacos = {}
@@ -20,6 +21,7 @@ local bomba
 local fundo
 
 local bombaSom
+local bananaSom
 
 local pontos
 local nivel
@@ -98,6 +100,7 @@ function love.load()
   vidas = 3
   
   bombaSom = love.audio.newSource('bomb.mp3')
+  bananaSom = love.audio.newSource('pick.mp3')
   nivel = 1
 end
 
@@ -177,6 +180,8 @@ function objetosContato(dt)
       --Pegou banana ou bomba
       table.remove(objetos,i)
       if obj.tipo == 1 then
+        bananaSom:rewind()
+        bananaSom:play()
         pontos = pontos + 1
         mac.quadro = 4
         mac.on = true
