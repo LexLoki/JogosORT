@@ -91,7 +91,11 @@ function enemy.update(dt,tim)
   enemy.update_progression(tim)
   if timer>time_spawn then
     timer = 0
-    enemy.spawn()
+    --enemy.spawn()
+    for i=1,love.math.random(1,3) do
+    --if love.math.random()>0.5 then
+      enemy.spawn()
+    end
   end
   local en
   for i=1,#enemy.list do
@@ -108,7 +112,7 @@ function enemy.update(dt,tim)
     --Move Inimigo
     en.x = en.x - en.vel*dt --Move todos
     if en.id == 2 then --Move duas vezes o tipo 2
-      en.x = en.x - en.vel*dt
+      en.x = en.x - 0.25*en.vel*dt
     elseif en.id == 3 then --Move no eixo y o tipo 3
       en.y = en.y + en.vel/2*dt
     end
