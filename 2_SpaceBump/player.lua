@@ -4,6 +4,9 @@ local alturaMax
 
 local sprites,timer,time,frame,sw,sh
 
+local jumpForce = 440 --300
+local gravity = 800 --500
+
 local function loadAnimation()
   sprites = {}
   for i=1,4 do
@@ -27,7 +30,7 @@ function player.load()
   player.height = 100
   alturaMax = love.graphics.getHeight()
   
-  player.grav = 500
+  player.grav = gravity
   loadAnimation()
 
   player.height = player.height*0.6
@@ -67,7 +70,7 @@ function player.update(dt)
 end
 
 function player.jump()
-  player.vel = -300
+  player.vel = -jumpForce
 end
 
 function player.draw()

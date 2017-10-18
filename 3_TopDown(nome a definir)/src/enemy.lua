@@ -38,6 +38,7 @@ function en.spawn()
     y = 100,
     hp = 10,
     dmg = 5,
+    factor = 1,
     speed = 140,
     timer = 0,
     frame = 1,
@@ -64,6 +65,7 @@ end
 
 function en.reset()
   en.list = {}
+  en.factor = 1
 end
 
 function en.movement(dt)
