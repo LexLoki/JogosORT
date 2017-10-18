@@ -1,7 +1,7 @@
 local enemy = {
   list = {},
-  width = 300,
-  height = 100
+  width = 200,
+  height = 66.66
 }
 
 local sprites = {}
