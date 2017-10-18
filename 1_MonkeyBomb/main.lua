@@ -57,10 +57,11 @@ end
 
 function loadMacaco()
   macacoPega = carregarImagens('imagens/monkey_catching_',4)
+  --[[
   local len = #macacoPega
   for i=1,len do
     macacoPega[len+i] = macacoPega[len+1-i]
-  end
+  end]]
   macacoPega.duracao = 0.15
   macacoAbaixa = carregarImagens('imagens/monkey_idle',2)
   macacoAbaixa.duracao = 0.75
@@ -147,12 +148,19 @@ function animarMacacos(dt)
   local mac
   for i=1, #macacos do
     mac = macacos[i]
-    mac.temporizador = mac.temporizador + dt
-    if mac.temporizador > mac.estado.duracao then
-      mac.temporizador = 0
-      mac.quadro = mac.quadro + 1
-      if mac.quadro > #mac.estado then
-        mac.quadro = 1
+    if mac.estado == macacoAbaixa or mac.on then
+      mac.temporizador = mac.temporizador + dt
+      if mac.temporizador > mac.estado.duracao then
+        mac.temporizador = 0
+        mac.quadro = mac.quadro + 1
+        if mac.quadro > #mac.estado then
+          if mac.estado == macacoPega then
+            mac.quadro = 3
+            mac.on = false
+          else
+            mac.quadro = 1
+          end
+        end
       end
     end
   end
@@ -164,11 +172,15 @@ function objetosContato(dt)
     obj = objetos[i]
     raia = obj.raia
     mac = macacos[raia]
-    if mac.estado == macacoPega and mac.y > obj.y and mac.y < obj.y + obj.largura then
+    local mao = mac.y + mac.altura*0.15
+    if mac.estado == macacoPega and mao > obj.y and mao < obj.y + obj.largura then
       --Pegou banana ou bomba
       table.remove(objetos,i)
       if obj.tipo == 1 then
         pontos = pontos + 1
+        mac.quadro = 4
+        mac.on = true
+        mac.temporizador = 0
       else
         bombaSom:rewind()
         bombaSom:play()
@@ -185,6 +197,7 @@ function trocaEstado(macaco)
   macaco.quadro = 1
   if macaco.estado == macacoAbaixa then
     macaco.estado = macacoPega
+    macaco.quadro = 3
   else
     macaco.estado = macacoAbaixa
   end
@@ -238,7 +251,7 @@ function love.draw()
     mac = macacos[i]
     --love.graphics.rectangle('fill',mac.x,mac.y,mac.largura,mac.altura)
     love.graphics.draw(mac.estado[mac.quadro],mac.x,mac.y,0,sx,sy)
-    --love.graphics.rectangle('fill',mac.x,mac.y,mac.largura,mac.altura)
+    --love.graphics.rectangle('line',mac.x,mac.y+0.1*mac.altura,mac.largura,mac.altura)
   end
   
   --Desenha objetos
