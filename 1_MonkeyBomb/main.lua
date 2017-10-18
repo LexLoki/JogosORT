@@ -57,7 +57,11 @@ end
 
 function loadMacaco()
   macacoPega = carregarImagens('imagens/monkey_catching_',4)
-  macacoPega.duracao = 0.3
+  local len = #macacoPega
+  for i=1,len do
+    macacoPega[len+i] = macacoPega[len+1-i]
+  end
+  macacoPega.duracao = 0.15
   macacoAbaixa = carregarImagens('imagens/monkey_idle',2)
   macacoAbaixa.duracao = 0.75
   
