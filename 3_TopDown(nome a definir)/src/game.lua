@@ -64,6 +64,7 @@ function game.draw()
   love.graphics.draw(bg,0,0,0,bg_scale)
   player.draw()
   enemy.draw()
+  love.graphics.setColor(255,255,255)
   love.graphics.print(game.score, offsetx, offsety)
 end
 

@@ -9,8 +9,8 @@ local function loadAnimation()
   for i=1,4 do
     sprites[i] = love.graphics.newImage('assets/player/a_spaceShip_'..i..'.png')
   end
-  sprites[5] = sprites[3]
-  sprites[6] = sprites[2]
+  --sprites[5] = sprites[3]
+  --sprites[6] = sprites[2]
   frame = 1
   local iw,ih = sprites[1]:getDimensions()
   sw = player.width/iw
@@ -21,7 +21,7 @@ end
 
 function player.load()
   player.vel = -200
-  player.x = 100
+  player.x = 30
   player.y = 350
   player.width = 100
   player.height = 100
@@ -37,9 +37,16 @@ function player.update(dt)
   timer = timer+dt
   if timer>time then
     timer = 0
-    frame = frame+1
-    if frame>#sprites then
-      frame = 1
+    if player.vel<0 then
+      frame = frame+1
+      if frame>#sprites then
+        frame = #sprites
+      end
+    else
+      frame = frame-1
+      if frame<1 then
+        frame = 1
+      end
     end
   end
   player.y = player.y + player.vel*dt -- Aplicando velocidade na posicao

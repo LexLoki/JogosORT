@@ -7,6 +7,9 @@ function love.load()
   game.load()
   menu.load()
   state = menu
+  local music = love.audio.newSource('music.mp3')
+  music:setLooping(true)
+  music:play()
 end
 
 function love.update(dt)
