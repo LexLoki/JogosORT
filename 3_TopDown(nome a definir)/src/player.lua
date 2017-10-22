@@ -65,14 +65,14 @@ end
 local function update_movement(dt)
   --Movimento eixo x
   local dir = 0
-  if love.keyboard.isDown('a') then dir = -1
-  elseif love.keyboard.isDown('d') then dir = 1
+  if love.keyboard.isDown('a') or love.keyboard.isDown('left') then dir = -1
+  elseif love.keyboard.isDown('d') or love.keyboard.isDown('right') then dir = 1
   end
   player.x = player.x + dir*player.speed*dt
   --Movimento eixo y
   dir = 0
-  if love.keyboard.isDown('w') then dir = -1
-  elseif love.keyboard.isDown('s') then dir = 1
+  if love.keyboard.isDown('w') or love.keyboard.isDown('up') then dir = -1
+  elseif love.keyboard.isDown('s') or love.keyboard.isDown('down') then dir = 1
   end
   player.y = player.y + dir*player.speed*dt
 end

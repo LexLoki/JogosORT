@@ -15,6 +15,7 @@ offsetx, offsety = 0, 0
 arena_width, arena_height = 0,0
 
 local music
+local scoreImage
 
 function game.load()
   player.load()
@@ -28,6 +29,9 @@ function game.load()
   music:setVolume(0.14)
   music:setLooping(true)
   music:play()
+  local font = love.graphics.newFont('assets/pixeled.ttf', 38)
+  love.graphics.setFont(font)
+  scoreImage = love.graphics.newImage('assets/score.png')
 end
 
 local function update_camera()
@@ -71,7 +75,9 @@ function game.draw()
   player.draw()
   enemy.draw()
   love.graphics.setColor(255,255,255)
-  love.graphics.print(game.score, offsetx, offsety)
+  love.graphics.printf(game.score, offsetx , offsety, w-20, 'right')
+  --love.graphics.print(game.score, offsetx, offsety)
+  love.graphics.draw(scoreImage, offsetx + w - 260, offsety+40, 0, 2.4)
 end
 
 return game
