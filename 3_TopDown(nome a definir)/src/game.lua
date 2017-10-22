@@ -24,7 +24,8 @@ function game.load()
   arena_width = 1.5*w
   bg_scale = arena_width / bg:getWidth()
   arena_height = bg:getHeight()*bg_scale
-  music = love.audio.newSource('assets/pixel_song_4.mp3')
+  music = love.audio.newSource('assets/musicaZombie.mp3')
+  music:setVolume(0.14)
   music:setLooping(true)
   music:play()
 end
