@@ -1,7 +1,8 @@
 local en = {}
 
 local spawn_timer
-local spawn_time = 1
+local spawn_time_i = 1.2
+local spawn_time = spawn_time_i
 
 local w,h
 local radius = 30
@@ -19,6 +20,8 @@ local scale = {}
 
 local anim_time = 0.4
 
+local hit
+
 function en.load(player)
   w,h = love.graphics.getDimensions()
   en.list = {}
@@ -32,6 +35,7 @@ function en.load(player)
   scale.x = radius*2.1/iw
   scale.y = radius*2.1/ih
   explosions.load(colors)
+  hit = love.audio.newSource('assets/hit.mp3')
 end
 
 function en.spawn()
@@ -46,19 +50,29 @@ function en.spawn()
     frame = 1,
     id = love.math.random(1,2)
   }
-  local area = love.math.random(1,4)
-  if area == 1 then
-    e.x = -w*0.2
-    e.y = love.math.random(0,h*1.2)
-  elseif area == 2 then
-    e.x = love.math.random(-w*0.2,w)
-    e.y = -h*0.2
-  elseif area == 3 then
-    e.x = 1.2*w
-    e.y = love.math.random(-0.2*h,h)
-  elseif area == 4 then
-    e.x = love.math.random(0,1.2*w)
-    e.y = 1.2*h
+  local ready = false
+  while not ready do
+    local area = love.math.random(1,4)
+    if area == 1 then
+      e.x = -w*0.2
+      e.y = love.math.random(0,h*1.2)
+    elseif area == 2 then
+      e.x = love.math.random(-w*0.2,w)
+      e.y = -h*0.2
+    elseif area == 3 then
+      e.x = 1.2*w
+      e.y = love.math.random(-0.2*h,h)
+    elseif area == 4 then
+      e.x = love.math.random(0,1.2*w)
+      e.y = 1.2*h
+    end
+    ready = true
+    for i,v in ipairs(en.list) do
+      if contact.circle(v.x,v.y,radius, e.x,e.y,radius) then
+        ready = false
+        break
+      end
+    end
   end
   e.x = e.x + offsetx
   e.y = e.y + offsety
@@ -68,6 +82,7 @@ end
 function en.reset()
   en.list = {}
   en.factor = 1
+  spawn_time = spawn_time_i
 end
 
 local function checkC(enemy)
@@ -138,6 +153,8 @@ function en.contact(game)
         game.score = game.score+1
         table.remove(en.list,i)
         explosions.add(e.x,e.y,e.angle,e.id,scale.x,scale.y)
+        hit:rewind()
+        hit:play()
       else
         --reseta jogo (gameover)
         return true
@@ -154,6 +171,7 @@ function en.update(dt,game)
     spawn_timer = 0
     en.spawn()
   end
+  spawn_time = math.max(0.4,spawn_time-dt*0.025)
   en.movement(dt)
   en.animation(dt)
   local didEnd = en.contact(game)

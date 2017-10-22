@@ -14,6 +14,8 @@ local w,h
 offsetx, offsety = 0, 0
 arena_width, arena_height = 0,0
 
+local music
+
 function game.load()
   player.load()
   enemy.load(player)
@@ -22,6 +24,9 @@ function game.load()
   arena_width = 1.5*w
   bg_scale = arena_width / bg:getWidth()
   arena_height = bg:getHeight()*bg_scale
+  music = love.audio.newSource('assets/pixel_song_4.mp3')
+  music:setLooping(true)
+  music:play()
 end
 
 local function update_camera()
