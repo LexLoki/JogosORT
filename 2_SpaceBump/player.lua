@@ -4,12 +4,12 @@ local alturaMax
 
 local sprites,timer,time,frame,sw,sh
 
-local jumpForce = 400 --300
-local gravity = 800 --500
+local jumpForce = 300
+local gravity = 1000 --500
 
 local function loadAnimation()
   sprites = {}
-  for i=1,4 do
+  for i=1,2 do
     sprites[i] = love.graphics.newImage('assets/player/a_spaceShip_'..i..'.png')
   end
   --sprites[5] = sprites[3]

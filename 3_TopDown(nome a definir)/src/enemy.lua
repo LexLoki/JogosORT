@@ -7,9 +7,10 @@ local w,h
 local radius = 30
 
 local contact = require'src/contact'
+local explosions = require'src/explosion'
 
 local colors = {
-    {255,0,0}, --colors[1]
+    {255,255,255}, --colors[1]
     {0,255,0}  --colors[2]
 }
 local images = {}
@@ -30,6 +31,7 @@ function en.load(player)
   pivot.y = ih/2
   scale.x = radius*2.1/iw
   scale.y = radius*2.1/ih
+  explosions.load(colors)
 end
 
 function en.spawn()
@@ -68,6 +70,19 @@ function en.reset()
   en.factor = 1
 end
 
+local function checkC(enemy)
+  local e
+  for i=1,#en.list do
+    e = en.list[i]
+    if e~=enemy then
+      if contact.circle(e.x,e.y,radius, enemy.x,enemy.y,radius) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 function en.movement(dt)
   local e
   local px = en.player.x
@@ -80,8 +95,16 @@ function en.movement(dt)
     e.angle = math.atan2(py-e.y, px-e.x)
     vx = math.cos(e.angle)*e.speed
     vy = math.sin(e.angle)*e.speed
+    local oldx = e.x
+    local oldy = e.y
     e.x = e.x + vx*dt
+    if checkC(e) then
+      e.x = oldx
+    end
     e.y = e.y + vy*dt
+    if checkC(e) then
+      e.y = oldy
+    end
   end
 end
 
@@ -114,6 +137,7 @@ function en.contact(game)
         --mata inimigo
         game.score = game.score+1
         table.remove(en.list,i)
+        explosions.add(e.x,e.y,e.angle,e.id,scale.x,scale.y)
       else
         --reseta jogo (gameover)
         return true
@@ -124,6 +148,7 @@ function en.contact(game)
 end
 
 function en.update(dt,game)
+  explosions.update(dt)
   spawn_timer = spawn_timer + dt
   if spawn_timer > spawn_time then
     spawn_timer = 0
@@ -136,6 +161,7 @@ function en.update(dt,game)
 end
 
 function en.draw()
+  explosions.draw()
   local e
   for i=1,#en.list do
     e = en.list[i]

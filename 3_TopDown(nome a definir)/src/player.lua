@@ -6,13 +6,42 @@ local player = {
   angle = 0
 }
 
+local scale
+
+local timer
+local imgs = {}
+local frame = 1
+local pivotx,pivoty
+
+local rot_angle = 0
+local rot_speed = 2*math.pi
+local rot_dir = 1
+
+local img
+local img_body
+local img_sword
+
 function player.load()
-  
+  --[[
+  for i=1,5 do
+    imgs[i] = love.graphics.newImage('assets/g_'..i..'.png')
+  end
+  for i=#imgs-1, 2, -1 do
+    table.insert(imgs,imgs[i])
+  end]]
+  img = love.graphics.newImage('assets/char.png')
+  --img_body = love.graphics.newImage('assets/body.png')
+  --img_sword = love.graphics.newImage('assets/sword.png')
+  local iw,ih = img:getDimensions()
+  scale = 2*math.min(player.radius/iw,player.radius/ih)
+  pivotx,pivoty = iw/2, ih/2
+  timer = 0
 end
 
 function player.reset()
   player.x = 100
   player.y = 100
+  timer = 0
 end
 
 function player.getArea(x,y)
@@ -68,21 +97,51 @@ local function update_angle(dt)
   player.angle = math.atan2(my-player.y, mx-player.x)
 end
 
+local function update_animation(dt)
+  timer = timer+dt
+  if timer > 0.08 then
+    timer = 0
+    frame = frame+1
+    if frame+1>#imgs then
+      frame = 1
+    end
+  end
+end
+
+local function update_rotation(dt)
+  rot_angle = rot_angle + rot_speed*rot_dir*dt
+  if rot_angle > math.pi then
+    rot_angle = math.pi
+    rot_dir = -1
+  elseif rot_angle < 0 then
+    rot_angle = 0
+    rot_dir = 1
+  end
+end
+
 function player.update(dt)
+  update_animation(dt)
   update_movement(dt)
   update_angle(dt)
   update_collision(dt)
+  update_rotation(dt)
 end
 
 function player.draw()
   love.graphics.setColor(255,255,255)
-  love.graphics.circle('fill',player.x,player.y,player.radius)
-  love.graphics.setColor(255,0,0)
-  love.graphics.setLineWidth(6)
-  love.graphics.arc('line','open',player.x,player.y,player.radius,player.angle-math.pi/2,player.angle+math.pi/2)
+  --love.graphics.circle('fill',player.x,player.y,player.radius)
+  love.graphics.setColor(255,0,0,120)
+  love.graphics.setLineWidth(3)--6)
+  --love.graphics.arc('line','open',player.x,player.y,player.radius,player.angle-math.pi/2,player.angle+math.pi/2)
   local b = player.angle + math.pi
-  love.graphics.setColor(0,255,0)
-  love.graphics.arc('line','open',player.x,player.y,player.radius,b-math.pi/2,b+math.pi/2)
+  love.graphics.setColor(0,255,0,120)
+  --love.graphics.arc('line','open',player.x,player.y,player.radius,b-math.pi/2,b+math.pi/2)
+  love.graphics.setColor(255,255,255)
+  --love.graphics.draw(imgs[frame], player.x, player.y, player.angle-math.pi/2, scale, scale, pivotx, pivoty)
+
+  love.graphics.draw(img,player.x,player.y,player.angle,scale,scale,pivotx,pivoty)
+  --love.graphics.draw(img_body,player.x,player.y,player.angle+rot_angle,scale,scale,pivotx,pivoty)
+  --love.graphics.draw(img_sword,player.x,player.y,player.angle+rot_angle,scale,scale,pivotx,pivoty)
   --love.graphics.line(mx,my,player.x,player.y)
   --love.graphics.setColor(255,255,255)
   --love.graphics.print(mx..'\n'..my)

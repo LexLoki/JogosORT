@@ -28,8 +28,6 @@ function love.changeToGame()
   state = game
 end
 
-
-
 function love.draw()
   state.draw()
 end
